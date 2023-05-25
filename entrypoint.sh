@@ -1,8 +1,8 @@
 #!/bin/bash -e
 if [ -z "${EXTERNAL_IP}" ];
 then
-  echo "External IP not set - trying to get IP by myself"
-  EXTERNAL_IP=$(curl -f icanhazip.com)
+  echo "SmartDNS IP not set - trying to get IP from wg0.conf"
+  EXTERNAL_IP=$(grep -oP 'Address = \K[^ /]+' /etc/wireguard/wg0.conf)
   export EXTERNAL_IP
 fi
 
@@ -22,15 +22,10 @@ then
   echo "Generated WebServer API Key: $DNSDIST_WEBSERVER_API_KEY"
 fi
 
-if [ -n "${ALLOWED_CLIENTS_FILE}" ];
+if [ -z "${ALLOWED_CLIENTS}" ];
 then
-  if [ -f "${ALLOWED_CLIENTS_FILE}" ];
-  then
-    chown dnsdist:dnsdist "$ALLOWED_CLIENTS_FILE"
-    ln -s "$ALLOWED_CLIENTS_FILE" /etc/dnsdist/allowedClients.acl
-  else
-    echo "[ERROR] ALLOWED_CLIENTS_FILE is set but file does not exists or is not accessible!"
-  fi
+  echo "ALLOWED_CLIENTS is not set, using default subnet from wg0.conf"
+  ALLOWED_CLIENTS=$(grep -oP 'Address = \K[^ ]+' /etc/wireguard/wg0.conf)
 else
   IFS=', ' read -ra array <<< "$ALLOWED_CLIENTS"
   printf '%s\n' "${array[@]}" > /etc/dnsdist/allowedClients.acl
@@ -44,6 +39,9 @@ then
   done < "/etc/dnsdist/allowedClients.acl"
 fi
 
+echo "[Wireguard] Starting wireguard server"
+wg-quick up wg0
+
 echo "Generating DNSDist Configs..."
 /bin/bash /etc/dnsdist/dnsdist.conf.template > /etc/dnsdist/dnsdist.conf
 
@@ -54,4 +52,5 @@ chown -R dnsdist:dnsdist /etc/dnsdist/
 echo "Starting sniproxy"
 /usr/local/bin/sniproxy --config "/etc/sniproxy/config.yaml" &
 echo "[INFO] Using $EXTERNAL_IP - Point your DNS settings to this address"
+
 wait -n
