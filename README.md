@@ -1,4 +1,4 @@
-[![Docker](https://github.com/Seji64/SniDust/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/Seji64/SniDust/actions/workflows/docker-publish.yml)
+The original implementation is [Seji64](https://github.com/Seji64/SniDust), but it doesn't have any authentication method if you open your DNS server to the public. I'm trying to add a WireGuard tunnel to it to make it more secure.
 
 # SniDust
 SmartDNS Proxy to hide your GeoLocation. Based on DnsDist and SniProxy
