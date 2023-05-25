@@ -1,0 +1,14 @@
+version: '3.3'
+services:
+    smart-dns:
+        container_name: dev
+        environment:
+            - ALLOWED_CLIENTS=127.0.0.1,10.0.0.0/24
+            - EXTERNAL_IP=10.0.0.254
+        ports:
+            - 51820:51820/udp
+        volumes:
+            - ./configs/wireguard:/etc/wireguard/
+        cap_add:
+            - NET_ADMIN
+        image: 'cwlu2001/smartdns-over-wireguard:latest'
