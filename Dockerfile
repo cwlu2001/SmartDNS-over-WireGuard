@@ -1,9 +1,9 @@
 FROM alpine:3.18
-LABEL org.opencontainers.image.authors="seji@tihoda.de"
+LABEL org.opencontainers.image.authors="github.com/cwlu2001"
 ARG TARGETPLATFORM
 
 ENV DNSDIST_BIND_IP=0.0.0.0
-ENV ALLOWED_CLIENTS=127.0.0.1
+ENV ALLOWED_CLIENTS=127.0.0.1,10.0.0.0/24
 ENV EXTERNAL_IP=
 ENV DNSDIST_WEBSERVER_PASSWORD=
 ENV DNSDIST_WEBSERVER_API_KEY=
