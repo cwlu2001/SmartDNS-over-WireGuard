@@ -1,10 +1,12 @@
 version: '3.3'
 services:
-    smart-dns:
-        container_name: dev
+    smartdns-over-wireguard:
+        container_name: smartdns-over-wireguard
         environment:
-            - ALLOWED_CLIENTS=127.0.0.1,10.0.0.0/24
             - EXTERNAL_IP=10.0.0.254
+            - ALLOWED_CLIENTS=127.0.0.1,10.0.0.0/24
+            - DNSDIST_ENABLE_WEBSERVER=false
+            - DNSDIST_WEBSERVER_NETWORKS_ACL=127.0.0.1,10.0.0.0/24
         ports:
             - 51820:51820/udp
         volumes:
