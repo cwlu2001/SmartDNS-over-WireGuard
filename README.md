@@ -4,6 +4,8 @@ The original implementation is [Seji64](https://github.com/Seji64/SniDust), but 
 
 - Netflix
 
+## How to use?
+
 ## Credits
 Based on the following projects:
 
