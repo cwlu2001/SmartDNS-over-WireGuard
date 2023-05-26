@@ -1,29 +1,26 @@
 #!/bin/bash -e
-if [ -z "${EXTERNAL_IP}" ];
-then
+if [ -z "${EXTERNAL_IP}" ]; then
   echo "SmartDNS IP not set - trying to get IP from wg0.conf"
   EXTERNAL_IP=$(grep -oP 'Address = \K[^ /]+' /etc/wireguard/wg0.conf)
   export EXTERNAL_IP
 fi
 
-if [ -z "${DNSDIST_WEBSERVER_PASSWORD}" ];
-then
-  echo "Dnsdist webserver password not set - generating one"
-  DNSDIST_WEBSERVER_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c12)
-  export DNSDIST_WEBSERVER_PASSWORD
-  echo "Generated WebServer Password: $DNSDIST_WEBSERVER_PASSWORD"
+if [ "${DNSDIST_ENABLE_WEBSERVER}" == "true" ]; then
+  if [ -z "${DNSDIST_WEBSERVER_PASSWORD}" ]; then
+    echo "Dnsdist webserver password not set - generating one"
+    DNSDIST_WEBSERVER_PASSWORD=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c12)
+    export DNSDIST_WEBSERVER_PASSWORD
+    echo "Generated WebServer Password: $DNSDIST_WEBSERVER_PASSWORD"
+  fi
+  if [ -z "${DNSDIST_WEBSERVER_API_KEY}" ]; then
+    echo "Dnsdist webserver api key not set - generating one"
+    DNSDIST_WEBSERVER_API_KEY=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32)
+    export DNSDIST_WEBSERVER_API_KEY
+    echo "Generated WebServer API Key: $DNSDIST_WEBSERVER_API_KEY"
+  fi
 fi
 
-if [ -z "${DNSDIST_WEBSERVER_API_KEY}" ];
-then
-  echo "Dnsdist webserver api key not set - generating one"
-  DNSDIST_WEBSERVER_API_KEY=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c32)
-  export DNSDIST_WEBSERVER_API_KEY
-  echo "Generated WebServer API Key: $DNSDIST_WEBSERVER_API_KEY"
-fi
-
-if [ -z "${ALLOWED_CLIENTS}" ];
-then
+if [ -z "${ALLOWED_CLIENTS}" ]; then
   echo "ALLOWED_CLIENTS is not set, using default subnet from wg0.conf"
   ALLOWED_CLIENTS=$(grep -oP 'Address = \K[^ ]+' /etc/wireguard/wg0.conf)
 else
@@ -31,10 +28,8 @@ else
   printf '%s\n' "${array[@]}" > /etc/dnsdist/allowedClients.acl
 fi
 
-if [ -f "/etc/dnsdist/allowedClients.acl" ];
-then
-  while IFS= read -r line
-  do
+if [ -f "/etc/dnsdist/allowedClients.acl" ]; then
+  while IFS= read -r line; do
     echo "$line,allow" >> /etc/sniproxy/allowedClients.acl
   done < "/etc/dnsdist/allowedClients.acl"
 fi
