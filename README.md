@@ -1,10 +1,13 @@
+This repository has been deprecated, moving to [v2](https://github.com/cwlu2001/smartdns-over-wireguard-v2)
+
+---
+
 The original implementation is [Seji64](https://github.com/Seji64/SniDust), but it doesn't have any authentication method if you open your DNS server to the public. I'm trying to add a WireGuard tunnel to it to make it more secure.
 
 ## Supported Services
 
 - Netflix
 
-## How to use?
 
 ## Credits
 Based on the following projects:
